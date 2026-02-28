@@ -6,6 +6,8 @@ public class ContentResponse {
     private Long id;
     private String url;
     private String title;
+    private String summary;
+    private String keywords;
     private String status;
     private LocalDateTime createdAt;
 
@@ -29,6 +31,12 @@ public class ContentResponse {
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
+
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
+
+    public String getKeywords() { return keywords; }
+    public void setKeywords(String keywords) { this.keywords = keywords; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

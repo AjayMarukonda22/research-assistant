@@ -19,8 +19,14 @@ public class Content {
     @Column(length = 5000)
     private String description;
 
-    @Column(length = 100000)
+    @Column(length = 500000)
     private String rawContent;
+
+    @Column(length = 5000)
+    private String summary;
+
+    @Column(length = 5000)
+    private String keywords; // Store as comma-separated
 
     private String status; // PENDING, PROCESSED, FAILED
 
@@ -51,6 +57,12 @@ public class Content {
 
     public String getRawContent() { return rawContent; }
     public void setRawContent(String rawContent) { this.rawContent = rawContent; }
+
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
+
+    public String getKeywords() { return keywords; }
+    public void setKeywords(String keywords) { this.keywords = keywords; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
