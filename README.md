@@ -15,7 +15,7 @@ To build the backend API for a personal knowledge assistant that allows users to
 ## Technology Stack
 - **Language:** Java 17+
 - **Framework:** Spring Boot 3.x
-- **Build Tool:** Maven or Gradle (We'll decide together)
+- **Build Tool:** Maven or Gradle
 - **Database:**
     - **SQL Database:** MySQL (for production) / H2 (for development) - for user data and content metadata (links, titles, etc.).
     - **Search Engine:** Elasticsearch - for storing and searching the processed text content, summaries, and topics.
