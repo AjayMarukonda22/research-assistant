@@ -18,17 +18,22 @@ spring:
       enabled: true
       path: /h2-console
 
-  # AI Configuration - NOW CORRECTLY INDENTED UNDER spring:
+  # AI Configuration
   ai:
     ollama:
       base-url: http://localhost:11434
       chat:
         model: tinyllama
-    # OR for OpenAI (commented out):
-    # openai:
-    #   api-key: ${OPENAI_API_KEY}
-    #   chat:
-    #     model: gpt-3.5-turbo
+
+  # Elasticsearch Configuration - MOVED HERE under spring:
+  elasticsearch:
+    uris: https://localhost:9200
+    username: elastic
+    password: ajay5702
+    connection-timeout: 10s
+    socket-timeout: 60s
+    ssl:
+      verification-mode: certificate  # Use 'certificate' instead of 'none'
 
 # Server configuration
 server:

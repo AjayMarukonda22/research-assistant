@@ -5,8 +5,11 @@ import com.example.smart_research.dto.ContentRequest;
 import com.example.smart_research.dto.ContentResponse;
 import com.example.smart_research.model.Content;
 import com.example.smart_research.repository.ContentRepository;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ContentService {
@@ -14,13 +17,16 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final ContentFetcherService contentFetcherService;
     private final AIService aiService;
+    private final SearchService searchService;
 
     public ContentService(ContentRepository contentRepository,
                           ContentFetcherService contentFetcherService,
-                          AIService aiService) {
+                          AIService aiService,
+                          SearchService searchService) {
         this.contentRepository = contentRepository;
         this.contentFetcherService = contentFetcherService;
         this.aiService = aiService;
+        this.searchService = searchService;
     }
 
     @Transactional
@@ -32,6 +38,7 @@ public class ContentService {
 
         // Create new content entity
         Content content = new Content(request.getUrl());
+        content.setStatus("FETCHING");
         content = contentRepository.save(content);
 
         // Fetch content from URL
@@ -42,39 +49,69 @@ public class ContentService {
             content.setTitle(result.getTitle());
             content.setDescription(result.getDescription());
             content.setRawContent(result.getContent());
+            content.setStatus("FETCHED");
+            content = contentRepository.save(content);
 
-            // Process with AI
-            try {
-                // Generate summary (first 2000 chars to save tokens)
-                String textToSummarize = result.getContent().substring(0,
-                        Math.min(result.getContent().length(), 2000));
-                String summary = aiService.summarize(textToSummarize, 500);
-                content.setSummary(summary);
+            // Index in Elasticsearch (even without AI results yet)
+            searchService.indexContent(content);
 
-                // Extract keywords
-                String[] keywords = aiService.extractKeywords(textToSummarize, 5);
-                String keywordsString = String.join(", ", keywords);
+            // Process AI in background
+            processWithAIBackground(content);
 
-                // Ensure it fits in database (leave margin)
-                if (keywordsString.length() > 4500) {
-                    keywordsString = keywordsString.substring(0, 4500) + "...";
-                }
-                content.setKeywords(keywordsString);
-
-                content.setStatus("PROCESSED_WITH_AI");
-            } catch (Exception e) {
-                // If AI fails, still mark as processed but without AI
-                content.setStatus("PROCESSED_NO_AI");
-                content.setSummary("AI processing failed: " + e.getMessage());
-            }
         } else {
             content.setStatus("FAILED");
             System.out.println("error : " + result.getErrorMessage());
+            content = contentRepository.save(content);
         }
 
-        content = contentRepository.save(content);
-
         return mapToResponse(content);
+    }
+
+    @Async
+    @Transactional
+    public CompletableFuture<Void> processWithAIBackground(Content content) {
+        try {
+            // Re-fetch the content to get latest state
+            Content freshContent = contentRepository.findById(content.getId())
+                    .orElseThrow(() -> new RuntimeException("Content not found"));
+
+            String textToProcess = freshContent.getRawContent().substring(0,
+                    Math.min(freshContent.getRawContent().length(), 2000));
+
+            // Generate summary
+            String summary = aiService.summarize(textToProcess, 500);
+            freshContent.setSummary(summary);
+
+            // Extract keywords
+            String[] keywords = aiService.extractKeywords(textToProcess, 5);
+            String keywordsString = String.join(", ", keywords);
+
+            // Ensure it fits in database (leave margin)
+            if (keywordsString.length() > 4500) {
+                keywordsString = keywordsString.substring(0, 4500) + "...";
+            }
+            freshContent.setKeywords(keywordsString);
+
+            freshContent.setStatus("PROCESSED_WITH_AI");
+            contentRepository.save(freshContent);
+
+            // Update Elasticsearch with AI results
+            searchService.updateContent(freshContent);
+
+            System.out.println("AI processing completed for content ID: " + content.getId());
+
+        } catch (Exception e) {
+            System.err.println("AI processing failed for content ID: " + content.getId() + " - " + e.getMessage());
+            try {
+                Content failedContent = contentRepository.findById(content.getId())
+                        .orElse(content);
+                failedContent.setStatus("AI_FAILED");
+                contentRepository.save(failedContent);
+            } catch (Exception ex) {
+                System.err.println("Could not update content status: " + ex.getMessage());
+            }
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
     @Transactional(readOnly = true)
