@@ -38,8 +38,8 @@ src/
 
 
 ## Weekly Progress Log
-- **Weekend 1 (Feb 15, 2026):** Initial project setup, basic Spring Boot application with a health check API, and H2 database configuration.
-- **Weekend 2:**
-- **Weekend 3:**
-- **...**
+- **Weekend 1 (Feb 15):** Project setup, Spring Boot, H2, health check API
+- **Weekend 2 (Feb 22):** Content entity, repository, Jsoup integration, POST endpoint
+- **Weekend 3 (Feb 28):** AI integration with Ollama, summarization, keyword extraction, Q&A endpoint
+- **Weekend 4 (Mar 8):** Elasticsearch integration, full-text search, SSL configuration, date formatting fixes
 
