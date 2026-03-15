@@ -13,8 +13,8 @@ public class ElasticsearchConfig extends ElasticsearchConfiguration {
     public ClientConfiguration clientConfiguration() {
         return ClientConfiguration.builder()
                 .connectedTo("localhost:9200")
-                .usingSsl()  // Will use the imported certificate
-                .withBasicAuth("elastic", "ajay5702")
+//                .usingSsl()  // Will use the imported certificate
+//                .withBasicAuth("elastic", "ajay5702")
                 .withConnectTimeout(10000)
                 .withSocketTimeout(60000)
                 .build();

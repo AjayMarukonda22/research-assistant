@@ -2,10 +2,14 @@ package com.example.smart_research.controller;
 
 import com.example.smart_research.dto.ContentRequest;
 import com.example.smart_research.dto.ContentResponse;
+import com.example.smart_research.model.Content;
 import com.example.smart_research.service.ContentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/contents")
@@ -25,6 +29,12 @@ public class ContentController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ContentResponse>> getAllContents() {
+        List<ContentResponse> responses = contentService.getAllContents();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")

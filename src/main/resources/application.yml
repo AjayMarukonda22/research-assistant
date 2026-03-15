@@ -27,13 +27,13 @@ spring:
 
   # Elasticsearch Configuration - MOVED HERE under spring:
   elasticsearch:
-    uris: https://localhost:9200
-    username: elastic
-    password: ajay5702
+    uris: http://localhost:9200
+#    username: elastic
+#    password: ajay5702
     connection-timeout: 10s
     socket-timeout: 60s
-    ssl:
-      verification-mode: certificate  # Use 'certificate' instead of 'none'
+#    ssl:
+#      verification-mode: certificate  # Use 'certificate' instead of 'none'
 
 # Server configuration
 server:

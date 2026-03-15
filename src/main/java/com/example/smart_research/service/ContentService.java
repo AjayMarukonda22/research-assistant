@@ -9,7 +9,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class ContentService {
@@ -119,6 +121,14 @@ public class ContentService {
         Content content = contentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Content not found"));
         return mapToResponse(content);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ContentResponse> getAllContents() {
+        List<Content> contents = contentRepository.findAll();
+        return contents.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
