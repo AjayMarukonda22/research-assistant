@@ -42,4 +42,5 @@ src/
 - **Weekend 2 (Feb 22):** Content entity, repository, Jsoup integration, POST endpoint
 - **Weekend 3 (Feb 28):** AI integration with Ollama, summarization, keyword extraction, Q&A endpoint
 - **Weekend 4 (Mar 8):** Elasticsearch integration, full-text search, SSL configuration, date formatting fixes
+- - **Weekend 5 (Mar 15):** React frontend with CORS, memory optimizations with tinyllama
 
